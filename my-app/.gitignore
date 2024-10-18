@@ -5,6 +5,7 @@
 .pnp.js
 .DS_Store
 node_modules
+.env
 
 # testing
 coverage
@@ -27,3 +28,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.db
+cert.pem
+key.pem

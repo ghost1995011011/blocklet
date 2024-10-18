@@ -38,16 +38,39 @@ if (isProduction) {
 }
 
 
-app.get('/api/profile', (req, res) => {
-  const profile = getProfile();
-  res.json(profile);
+app.get('/api/profile', async (req, res) => {
+  try {
+    const profile = await getProfile(); // Assuming getProfile is asynchronous
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    res.json(profile);
+  } catch (error) {
+    logger.error('Error fetching profile:', error); // Log the error for debugging
+    res.status(500).json({ error: 'Internal Server Error' }); // Send a generic error message to the client
+  }
 });
 
 app.post('/api/profile', (req, res) => {
-  const newProfile = req.body;
-  updateProfile(newProfile);
-  res.json(newProfile);
+  const { username, email, phone } = req.body;
+
+  if (!username || !email || !phone) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+  
+  updateProfile({ username, email, phone });
+  res.json({ message: 'Profile updated successfully' });
 });
+
+function validateEmail(email) {
+  const re = /\S+@\S+\.\S+/;
+  return re.test(email);
+}
 
 const port = parseInt(process.env.BLOCKLET_PORT, 10);
 
